@@ -1,8 +1,8 @@
-% Static force analysis of a balloon rigged with 12 ground tethers (Design cliff1)
-% By Thomas Bewley, JPL (on loan from UCSD)
+% Static force analysis of a balloon rigging (Design CliffA)
+% By Thomas Bewley, UC San Diego (+ faculty fellow at JPL)
 
+clear; figure(1); clf; config=1;
 % view([-111.6,8]); axis equal 
-config=1; S1=3;   % Symmetry (3-fold)
 switch config
     case 1
         Rb=80;          % Radius of balloon
@@ -38,46 +38,33 @@ Pdisturb=4.5    % (horizontal force on payload, in Newtons)
 
 % END OF ADJUSTABLE INPUTS
 
-dim=3;       % dimension of system (2D or 3D)
-b=2*S1;      % number of bars
-s=4*S1+1;    % number of strings
-m=b+s        % number of members
-q=2*S1;      % number of free nodes Q
-p=S1;        % number of fixed nodes P
-n=q+p;       % number of nodes
-
-% Now construct the 3-dimensional balloon configuration from above parameters
-% Locations of free nodes are P=P_(dim x p) and fixed nodes are Q=Q_(dim x q)
-for i=1:S1
-    phi1=pi+2*pi*(i-1)/S1+psi; phi=2*pi*(i-1)/S1+psi;
+% Free [Q=Q_(dim x q)] and fixed [Q=Q_(dim x q)] node locations
+for i=1:3
+    phi1=pi+2*pi*(i-1)/3+psi; phi=2*pi*(i-1)/3+psi;
     Q(1:3,     i)=[Rp*sin(phi)+off(1);  Rp*cos(phi)+off(2);  Hp]; % corners of payload
-    Q(1:3,  S1+i)=[Rb*sin(phi1)+off(1); Rb*cos(phi1)+off(2); Hb]; % anchor points on balloon
+    Q(1:3,  3+i)=[Rb*sin(phi1)+off(1); Rb*cos(phi1)+off(2); Hb]; % anchor points on balloon
 end
+[dim,q]=size(Q); p=size(P,2); n=q+p; 
 
-C=zeros(m,n);                               % Connectivity matrix
-for i=1:S1, j=mod(i,S1)+1; k=mod(i+1,S1)+1; 
-  C(     i,   i)=1; C(     i,     j)=-1;    % bars modelling payload
-  C(  S1+i,S1+i)=1; C(  S1+i,  S1+j)=-1;    % bars modelling balloon                                         
-  C(2*S1+i,S1+i)=1; C(2*S1+i,     j)=-1;    % strings from balloon to payload (set 1)
-  C(3*S1+i,S1+i)=1; C(3*S1+i,     k)=-1;    % strings from balloon to payload (set 2)
-  C(4*S1+i,S1+i)=1; C(4*S1+i,2*S1+i)=-1;    % strings from balloon to ground (set 1)
-  C(5*S1+i,S1+i)=1; C(5*S1+i,2*S1+k)=-1;    % strings from balloon to ground (set 2)
+b=6; s=13;  m=b+s;                  % Connectivity matrix
+for i=1:3, j=mod(i,3)+1; k=mod(i+1,3)+1; 
+  C(   i,  i)=1; C(   i,  j)=-1;    % bars modelling payload
+  C( 3+i,3+i)=1; C( 3+i,3+j)=-1;    % bars modelling balloon                                         
+  C( 6+i,3+i)=1; C( 6+i,  j)=-1;    % strings from balloon to payload (set 1)
+  C( 9+i,3+i)=1; C( 9+i,  k)=-1;    % strings from balloon to payload (set 2)
+  C(12+i,3+i)=1; C(12+i,6+i)=-1;    % strings from balloon to ground (set 1)
+  C(15+i,3+i)=1; C(15+i,6+k)=-1;    % strings from balloon to ground (set 2)
 end
-C(6*S1+1,   3)=1; C(6*S1+1,2*S1+1)=-1;      % strings from payload to ground
-% C(6*S1+2,   2)=1; C(6*S1+2,2*S1+1)=-1;    % strings from payload to ground
-% C(6*S1+3,   3)=1; C(6*S1+3,2*S1+1)=-1;    % strings from payload to ground
-tensegrity_plot(Q,P,C,b,s); hold on;
-[x,y,z] = ellipsoid(0,0,Hb,Rb,Rb,Rb*2/3,30); surf(x+off(1),y+off(2),z)
+C(19,3)=1; C(19,7)=-1;              % string from payload to ground
+
+[x,y,z] = ellipsoid(0,0,Hb,Rb,Rb,Rb*2/3,30); surf(x+off(1),y+off(2),z); hold on
 
 % Define applied external force U=U_(dim x p)
-U(1,[1:S1])=0;      U(2,[1:S1])     =Pdisturb/S1; U(3,[1:S1])=-weight/S1;
-U(1,[S1+1:2*S1])=0; U(2,[S1+1:2*S1])=Bdisturb/S1; U(3,[S1+1:2*S1])=lift/S1;
+U(1,[1:3])=0; U(2,[1:3])=Pdisturb/3; U(3,[1:3])=-weight/3;
+U(1,[4:6])=0; U(2,[4:6])=Bdisturb/3; U(3,[4:6])=lift/3;
 
-% Finally, solve for the forces at equilibrium.
-if exist('constraints')
-    [c_bars,t_strings,V]=tensegrity_statics(b,s,q,p,dim,Q,P,C,U,constraints);
-else
-    [c_bars,t_strings,V]=tensegrity_statics(b,s,q,p,dim,Q,P,C,U);
-end
+% Solve for the forces at equilibrium, and plot
+[c_bars,t_strings,V]=tensegrity_statics(b,s,q,p,dim,Q,P,C,U);
+tensegrity_plot(Q,P,C,b,s,U,V,false,0.5,4); grid on
 
-% end script 2D
+% end script CliffA
