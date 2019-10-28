@@ -10,7 +10,6 @@ The main code (tensegrity_statics.m) implements the equations in section 2.1 of:
    
 The plotting code (tensegrity_plot.m) makes some rudimentary 2D or 3D plots, as appropriate.
 
-All figures from the above paper are also included, in addition to a few from
+All figures from the above paper are included as examples, in addition to a few from
    Skelton and de Oliveira (2009) Tensegrity Systems
-   
 Please do submit pull requests as you develop more examples!  :)
