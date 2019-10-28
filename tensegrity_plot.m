@@ -1,4 +1,5 @@
-function tensegrity_plot(Q,P,C,b,s,U,V)
+function tensegrity_plot(Q,P,C,b,s,U,V,outer,fac,fac1)
+% Code by Thomas Bewley (UCSD), written in Summer 2019 as a JPL Faculty Fellow.
 [dim,q]=size(Q); p=size(P,2); N=[Q P]; [M,I]=max(C'); [M,J]=min(C'); hold on
 if dim==2
     for k=1:b,     plot([N(1,I(k)) N(1,J(k))],[N(2,I(k)) N(2,J(k))],'r-'), end
@@ -25,27 +26,29 @@ for i=1:p   % Draw a symbol below each ground point.
     else trisurf(T,s*X+P(1,i),s*Y+P(2,i),s*Z+P(3,i),0) % A tetrahedron
     end
 end
-outer_arrows=true;
+if nargin<8, outer=false; end, if nargin<9, fac=1; end, if nargin<10, fac1=1; end
 if nargin>5
-    for i=1:q, force_mag(i)=norm(U(:,i)); end, s=s*10/max(force_mag);
-    for i=1:q, if dim==3,
-            if outer_arrows
-               quiver3(Q(1,i)-s*U(1,i),Q(2,i)-s*U(2,i),Q(3,i)-s*U(3,i),s*U(1,i),s*U(2,i),s*U(3,i),0);
+    for i=1:q, force_mag(i)=norm(U(:,i)); end, s=fac*s*10/max(force_mag);
+    for i=1:q, if dim==3
+            if outer
+                mArrow3(Q(:,i)-s*U(:,i),Q(:,i),'facealpha',0.5,'color','magenta','tipWidth',s*fac1);
             else
-               quiver3(Q(1,i),Q(2,i),Q(3,i),s*U(1,i),s*U(2,i),s*U(3,i),0);
+                mArrow3(Q(:,i),Q(:,i)+s*U(:,i),'facealpha',0.5,'color','magenta','tipWidth',s*fac1);
             end
         else
-            if outer_arrows
-               quiver(Q(1,i)-s*U(1,i),Q(2,i)-s*U(2,i),s*U(1,i),s*U(2,i),0);
+            if outer
+                h=quiver(Q(1,i)-s*U(1,i),Q(2,i)-s*U(2,i),s*U(1,i),s*U(2,i),0);
             else
-               quiver(Q(1,i),Q(2,i),s*U(1,i),s*U(2,i),0);
+                h=quiver(Q(1,i),Q(2,i),s*U(1,i),s*U(2,i),0);
             end
+            set(h,'MaxHeadSize',10000,'linewidth',2,'color','m')
         end, end
 end
 if nargin>6
     for i=1:p, if dim==3,
-            quiver3(P(1,i),P(2,i),P(3,i),s*V(1,i),s*V(2,i),s*V(3,i),0);
+            mArrow3(P(:,i),P(:,i)+s*V(:,i),'facealpha',0.5,'color','blue','tipWidth',s*fac1);
         else
-            quiver(P(1,i),P(2,i),s*V(1,i),s*V(2,i),0);
-        end, end
+            h=quiver(P(1,i),P(2,i),s*V(1,i),s*V(2,i),0);
+            set(h,'MaxHeadSize',10000,'linewidth',2,'color','b')
+        end, , end
 end
