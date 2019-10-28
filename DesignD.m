@@ -1,6 +1,7 @@
 % Static force analysis of a balloon rigged with 9 ground tethers (Design D)
 % By Thomas Bewley, JPL (on loan from UCSD)
-clear
+
+clear; figure(1); clf;
 Rb=2;     % Radius of balloon
 Rp=1;     % Radius of payload
 Rg=20;    % Radius of outer-most ground attachment points
@@ -77,6 +78,6 @@ U([1:3],S1+S2+1)=0;
 
 % Finally, solve for the forces at equilibrium.
 [c_bars,t_strings,V]=tensegrity_statics(b,s,q,p,dim,Q,P,C,U,extra_constraints);
-figure(1); clf; tensegrity_plot(Q,P,C,b,s,U,V)
+tensegrity_plot(Q,P,C,b,s,U,V,false,1,4); grid on
 
-% end script 2D
+% end script DesignD

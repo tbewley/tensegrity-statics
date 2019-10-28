@@ -1,6 +1,7 @@
 % Static force analysis of a balloon rigged with 12 ground tethers  (Design C)
 % By Thomas Bewley, JPL (on loan from UCSD)
-clear
+
+clear; figure(1); clf;
 Rb=2;     % Radius of balloon
 Rp=1;     % Radius of payload
 Rg=20;    % Radius of outer-most ground attachment points
@@ -15,8 +16,8 @@ alpha=2*pi/3;  % Opening angle
 % Below are a few parameters specific to the balloon problem:
 lift=200;     % (lift force of balloon, in Newtons)
 weight=100;   % (weight of payload, in Newtons)
-Bdisturb=22.3   % (horizontal force on balloon, in Newtons)
-Pdisturb=3    % (horizontal force on payload, in Newtons)
+Bdisturb=-18.5 % (horizontal force on balloon, in Newtons)
+Pdisturb=-4.5  % (horizontal force on payload, in Newtons)
 
 % Note: This system needs 1 additional constraint, in addition to accounting for the
 % pullies by taking the tensions in the upper pyramid equal, and has no soft nodes.
@@ -70,6 +71,6 @@ U([1:3],2*S1+1)=0;
 
 % Finally, solve for the forces at equilibrium.
 [c_bars,t_strings,V]=tensegrity_statics(b,s,q,p,dim,Q,P,C,U,extra_constraints);
-figure(1); clf; tensegrity_plot(Q,P,C,b,s,U,V)
+tensegrity_plot(Q,P,C,b,s,U,V,false,1,3); grid on
 
-% end script 2D
+% end script DesignC

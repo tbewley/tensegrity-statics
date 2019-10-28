@@ -1,47 +1,37 @@
-% Static force analysis of a balloon rigged with 12 ground tethers (Design B)
-% By Thomas Bewley, JPL (on loan from UCSD)
-clear; clf; 
-% Note: This system needs no addtional constraints and has no soft nodes.
+% Static force analysis of 2D TBar (Fig 3.3 of Skelton & de Oliviera 2009)
+% By Thomas Bewley, UC San Diego (+ faculty fellow at JPL)
+clear; clf; figure(1);
 
-dim=3;    % dimension of system
-b=5;      % number of bars
-s=9;      % number of strings
-m=b+s;    % number of members
-q=6;      % number of free nodes Q
-p=0;      % number of fixed nodes P
-n=q+p;    % number of nodes
-
-% Now construct the 3-dimensional balloon configuration from above parameters
-% Locations of free nodes are P=P_(dim x p) and fixed nodes are Q=Q_(dim x q)
-r=0.5;
-Q(:,1)=[0; 0;   0];
-Q(:,2)=[1; 0;   0];
-Q(:,3)=[2; 0;   0];
+% Free [Q=Q_(dim x q)] and fixed [Q=Q_(dim x q)] node locations
+Q(:,1)=[0; 0; 0];
+Q(:,2)=[1; 0; 0];
+Q(:,3)=[2; 0; 0]; r=0.5;
 Q(:,4)=[1; r*cos(0);      r*sin(0)];
 Q(:,5)=[1; r*cos(2*pi/3); r*sin(2*pi/3)]; 
-Q(:,6)=[1; r*cos(4*pi/3); r*sin(4*pi/3)]; 
-P=[];
-C=zeros(m,n);                               % Connectivity matrix
-C( 1,1)=1; C( 1,2)=-1;    % bars 
-C( 2,2)=1; C( 2,3)=-1;
-C( 3,2)=1; C( 3,4)=-1;
-C( 4,2)=1; C( 4,5)=-1;
-C( 5,2)=1; C( 5,6)=-1;
-C( 6,1)=1; C( 6,4)=-1;    % strings 
-C( 7,1)=1; C( 7,5)=-1;    
-C( 8,1)=1; C( 8,6)=-1;    
-C( 9,3)=1; C( 9,4)=-1;    
-C(10,3)=1; C(10,5)=-1;    
-C(11,3)=1; C(11,6)=-1;    
-C(12,4)=1; C(12,5)=-1;    
-C(13,5)=1; C(13,6)=-1;    
-C(14,6)=1; C(14,4)=-1;    
+Q(:,6)=[1; r*cos(4*pi/3); r*sin(4*pi/3)]; P=[];
+[dim,q]=size(Q); p=size(P,2); n=q+p; 
 
-% Define applied external force U=U_(dim x q)
+% Connectivity matrix
+C(  1,1)=1; C(  1,2)=-1;       % bars 
+C(  2,2)=1; C(  2,3)=-1;
+C(  3,2)=1; C(  3,4)=-1;
+C(  4,2)=1; C(  4,5)=-1;
+C(  5,2)=1; C(  5,6)=-1; b=5;
+C(b+1,1)=1; C(b+1,4)=-1;       % strings 
+C(b+2,1)=1; C(b+2,5)=-1;    
+C(b+3,1)=1; C(b+3,6)=-1;    
+C(b+4,3)=1; C(b+4,4)=-1;    
+C(b+5,3)=1; C(b+5,5)=-1;    
+C(b+6,3)=1; C(b+6,6)=-1;    
+C(b+7,4)=1; C(b+7,5)=-1;    
+C(b+8,5)=1; C(b+8,6)=-1;    
+C(b+9,6)=1; C(b+9,4)=-1; s=9; m=b+s;
+
+% Applied external force U=U_(dim x q)
 U(1:dim,1:6)=0; U(1,1)=1; U(1,3)=-1;
 
-% Finally, solve for the forces at equilibrium.
+% Solve for the forces at equilibrium, and plot
 [c_bars,t_strings,V]=tensegrity_statics(b,s,q,p,dim,Q,P,C,U);
-figure(2); tensegrity_plot(Q,P,C,b,s,U,V); axis equal
+tensegrity_plot(Q,P,C,b,s,U,V,true,1,0.08); grid on;
 
-% end script 2D
+% end script TBar3
