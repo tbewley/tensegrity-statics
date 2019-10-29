@@ -1,4 +1,4 @@
-% Static force analysis of a balloon rigged with 6 ground tethers  (Design A)
+% Static force analysis of a balloon rigged with 6 ground tethers (Design A)
 % By Thomas Bewley, JPL (on loan from UCSD)
 
 clear; figure(1); clf;
